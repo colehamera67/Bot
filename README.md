@@ -51,9 +51,15 @@ python buy_automation.py
 - **Button not found**: Make sure the RuneLite window is visible and not minimized
 - **Wrong button clicked**: Adjust the `CONFIDENCE` value in the script (0.0 to 1.0)
 - **Script too fast**: Increase the `WAIT_TIME` value in the script
+- **Step 4 fails**: Step 4 has special handling:
+  - Waits 4 seconds (longer than other steps)
+  - Uses 30 total retries with confidence levels 0.65 → 0.55 → 0.45
+  - If still failing, increase `FOURTH_STEP_WAIT` in the script
+  - Make sure the "Set to Copilot price" button is clearly visible
 
 ## Configuration
 
 You can adjust these settings in `buy_automation.py`:
-- `CONFIDENCE`: Image matching confidence (default: 0.8)
-- `WAIT_TIME`: Seconds to wait between actions (default: 1.0)
+- `CONFIDENCE`: Image matching confidence (default: 0.7)
+- `WAIT_TIME`: Seconds to wait between actions for steps 1-3 (default: 2.5)
+- `FOURTH_STEP_WAIT`: Seconds to wait before step 4 (default: 4.0, longer because step 4 loads slower)
