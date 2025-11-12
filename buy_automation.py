@@ -21,7 +21,7 @@ FOURTH_STEP_BUTTON = os.path.join(BUYING_DIR, "4thstep.png")
 CONFIDENCE = 0.7  # Image matching confidence (0.0 to 1.0) - lowered for better matching
 WAIT_TIME = 2.5   # Seconds to wait between actions - increased for 2nd step to load
 SECOND_STEP_RETRIES = 10  # More retries for 2nd step button
-FOURTH_STEP_WAIT = 4.0  # Longer wait for 4th step (takes longer to load)
+FOURTH_STEP_WAIT = 6.0  # Longer wait for 4th step (takes much longer to load)
 
 
 def find_and_click(image_path, button_name, retries=3, confidence=None, wait_between=0.5):
@@ -208,40 +208,49 @@ def click_fourth_step_button():
     print(f"Waiting {FOURTH_STEP_WAIT} seconds for 4th step to appear (longer wait)...")
     time.sleep(FOURTH_STEP_WAIT)
 
-    # Try to find and click the 4th step button with more retries and lower confidence
-    print(f"Attempting to find 4th step button (15 retries with aggressive settings)...")
+    # Try to find and click the 4th step button with very aggressive settings
+    print(f"Attempting to find 4th step button with very aggressive retry logic...")
 
-    # First try with slightly lower confidence (0.65) - 4th button is smaller
-    print("Attempt 1: Trying with confidence 0.65...")
+    # First try with low confidence (0.6) - 4th button is smaller and harder to detect
+    print("Attempt 1: Trying with confidence 0.6 (20 retries)...")
     if find_and_click(FOURTH_STEP_BUTTON, "4th Step Button",
-                     retries=15,
-                     confidence=0.65,
-                     wait_between=1.2):
-        return True
-
-    # If that fails, try with even lower confidence
-    print("\n⚠ First attempt failed. Trying with lower confidence (0.55)...")
-    if find_and_click(FOURTH_STEP_BUTTON, "4th Step Button (Low Confidence)",
-                     retries=10,
-                     confidence=0.55,
+                     retries=20,
+                     confidence=0.6,
                      wait_between=1.5):
         return True
 
-    # Final attempt with very low confidence
-    print("\n⚠ Second attempt failed. Final try with very low confidence (0.45)...")
-    if find_and_click(FOURTH_STEP_BUTTON, "4th Step Button (Very Low Confidence)",
-                     retries=5,
-                     confidence=0.45,
+    # Second attempt with lower confidence
+    print("\n⚠ First attempt failed. Trying with lower confidence (0.5, 15 retries)...")
+    if find_and_click(FOURTH_STEP_BUTTON, "4th Step Button (Low Confidence)",
+                     retries=15,
+                     confidence=0.5,
                      wait_between=2.0):
+        return True
+
+    # Third attempt with very low confidence
+    print("\n⚠ Second attempt failed. Trying with very low confidence (0.4, 10 retries)...")
+    if find_and_click(FOURTH_STEP_BUTTON, "4th Step Button (Very Low Confidence)",
+                     retries=10,
+                     confidence=0.4,
+                     wait_between=2.5):
+        return True
+
+    # Final desperate attempt with extremely low confidence
+    print("\n⚠ Third attempt failed. Final try with extremely low confidence (0.3, 5 retries)...")
+    if find_and_click(FOURTH_STEP_BUTTON, "4th Step Button (Extremely Low Confidence)",
+                     retries=5,
+                     confidence=0.3,
+                     wait_between=3.0):
         return True
 
     print("\n❌ ERROR: Could not find 4th step button on screen after all attempts!")
     print("Troubleshooting tips:")
     print("  1. Make sure the 4th step dialog/window is visible and fully loaded")
     print("  2. Check that 4thstep.png matches the 'Set to Copilot price' button on screen")
-    print("  3. Try taking a new screenshot of the button (make sure it's clear)")
+    print("  3. Try taking a new screenshot of the button (make sure it's clear and exact)")
     print("  4. Make sure the button is not obscured or off-screen")
-    print("  5. The 4th step might take longer to load - try increasing FOURTH_STEP_WAIT")
+    print("  5. The button might have different colors/styling - try capturing it again")
+    print("  6. Try increasing FOURTH_STEP_WAIT to 8 or 10 seconds if it loads very slowly")
     return False
 
 
@@ -250,13 +259,13 @@ def main():
     Main automation workflow.
     """
     print("="*50)
-    print("RuneLite Buy Button Automation v3.1")
+    print("RuneLite Buy Button Automation v3.2")
     print("="*50)
     print(f"Configuration:")
     print(f"  - Confidence: {CONFIDENCE}")
     print(f"  - Wait time (steps 1-3): {WAIT_TIME}s")
-    print(f"  - Wait time (step 4): {FOURTH_STEP_WAIT}s (longer)")
-    print(f"  - Step retries: {SECOND_STEP_RETRIES}")
+    print(f"  - Wait time (step 4): {FOURTH_STEP_WAIT}s (much longer)")
+    print(f"  - Step 4 retries: 50 total (very aggressive)")
     print(f"  - Total steps: 4 (Buy → 2nd → 3rd → 4th)")
     print("="*50)
 
