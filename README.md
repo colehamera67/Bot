@@ -51,13 +51,14 @@ python buy_automation.py
 - **Button not found**: Make sure the RuneLite window is visible and not minimized
 - **Wrong button clicked**: Adjust the `CONFIDENCE` value in the script (0.0 to 1.0)
 - **Script too fast**: Increase the `WAIT_TIME` value in the script
-- **Step 3 fails**: Step 3 button is very small (38x33) and has aggressive detection:
+- **Step 3 fails or clicks wrong button**: Step 3 button has unique shading and needs HIGH confidence:
   - Waits 4 seconds (longer than steps 1-2)
-  - Uses 50 total retries with confidence levels 0.6 → 0.5 → 0.4 → 0.3
+  - Uses 50 total retries with HIGH confidence levels 0.85 → 0.8 → 0.75 → 0.7
+  - Higher confidence = more exact match = only clicks button WITH shading
   - Wait times between retries: 1.5s → 2.0s → 2.5s → 3.0s
+  - If clicking wrong button, the shading in the image needs to be captured more precisely
+  - Make sure 3rdstep.png shows the button with the shading (not without it)
   - If still failing, increase `THIRD_STEP_WAIT` to 6 or 8 seconds
-  - Make sure the small button is clearly visible and not obscured
-  - Try recapturing the button image precisely (it's very small)
 - **Step 4 fails**: Step 4 has very aggressive special handling:
   - Waits 6 seconds (much longer than other steps)
   - Uses 50 total retries with confidence levels 0.6 → 0.5 → 0.4 → 0.3

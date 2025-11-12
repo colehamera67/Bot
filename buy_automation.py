@@ -146,7 +146,7 @@ def click_second_step_button():
 def click_third_step_button():
     """
     Clicks the 3rd step button after the 2nd step has been clicked.
-    Note: Step 3 button is very small (38x33) and needs aggressive detection.
+    Note: Step 3 button has shading - needs HIGH confidence for exact match.
     """
     print("\n=== Step 3: Clicking 3rd Step Button ===")
 
@@ -155,52 +155,52 @@ def click_third_step_button():
         print("Please add the 3rdstep.png image to the Buying folder.")
         return False
 
-    # Give the interface MORE time to transition to the 3rd step (small button)
+    # Give the interface MORE time to transition to the 3rd step
     print(f"Waiting {THIRD_STEP_WAIT} seconds for 3rd step to appear (longer wait)...")
     time.sleep(THIRD_STEP_WAIT)
 
-    # Try to find and click the 3rd step button with very aggressive settings
-    print(f"Attempting to find 3rd step button with aggressive retry logic...")
+    # Try to find and click the 3rd step button with HIGH confidence for exact match
+    print(f"Attempting to find 3rd step button with high confidence (exact match)...")
 
-    # First try with low confidence (0.6) - 3rd button is very small (38x33)
-    print("Attempt 1: Trying with confidence 0.6 (20 retries)...")
+    # First try with high confidence (0.85) - button has unique shading
+    print("Attempt 1: Trying with confidence 0.85 (exact match, 20 retries)...")
     if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button",
                      retries=20,
-                     confidence=0.6,
+                     confidence=0.85,
                      wait_between=1.5):
         return True
 
-    # Second attempt with lower confidence
-    print("\n⚠ First attempt failed. Trying with lower confidence (0.5, 15 retries)...")
-    if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (Low Confidence)",
+    # Second attempt with slightly lower confidence
+    print("\n⚠ First attempt failed. Trying with confidence 0.8 (15 retries)...")
+    if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (High Confidence)",
                      retries=15,
-                     confidence=0.5,
+                     confidence=0.8,
                      wait_between=2.0):
         return True
 
-    # Third attempt with very low confidence
-    print("\n⚠ Second attempt failed. Trying with very low confidence (0.4, 10 retries)...")
-    if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (Very Low Confidence)",
+    # Third attempt with medium-high confidence
+    print("\n⚠ Second attempt failed. Trying with confidence 0.75 (10 retries)...")
+    if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (Medium-High Confidence)",
                      retries=10,
-                     confidence=0.4,
+                     confidence=0.75,
                      wait_between=2.5):
         return True
 
-    # Final desperate attempt with extremely low confidence
-    print("\n⚠ Third attempt failed. Final try with extremely low confidence (0.3, 5 retries)...")
-    if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (Extremely Low Confidence)",
+    # Final attempt with standard confidence
+    print("\n⚠ Third attempt failed. Final try with confidence 0.7 (5 retries)...")
+    if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (Standard Confidence)",
                      retries=5,
-                     confidence=0.3,
+                     confidence=0.7,
                      wait_between=3.0):
         return True
 
     print("\n❌ ERROR: Could not find 3rd step button on screen after all attempts!")
     print("Troubleshooting tips:")
     print("  1. Make sure the 3rd step dialog/window is visible and fully loaded")
-    print("  2. Check that 3rdstep.png matches the button on screen (very small button)")
-    print("  3. Try taking a new screenshot of the button (make sure it's clear and exact)")
+    print("  2. The button with SHADING should be visible (that's the correct one)")
+    print("  3. Make sure 3rdstep.png has the shading and matches exactly")
     print("  4. Make sure the button is not obscured or off-screen")
-    print("  5. The button is very small (38x33) - capture it precisely")
+    print("  5. Try recapturing the button with the shading if colors differ")
     print("  6. Try increasing THIRD_STEP_WAIT to 6 or 8 seconds if it loads slowly")
     return False
 
@@ -272,15 +272,15 @@ def main():
     Main automation workflow.
     """
     print("="*50)
-    print("RuneLite Buy Button Automation v3.3")
+    print("RuneLite Buy Button Automation v3.4")
     print("="*50)
     print(f"Configuration:")
     print(f"  - Confidence: {CONFIDENCE}")
     print(f"  - Wait time (steps 1-2): {WAIT_TIME}s")
-    print(f"  - Wait time (step 3): {THIRD_STEP_WAIT}s (longer, small button)")
+    print(f"  - Wait time (step 3): {THIRD_STEP_WAIT}s (longer)")
     print(f"  - Wait time (step 4): {FOURTH_STEP_WAIT}s (much longer)")
-    print(f"  - Step 3 retries: 50 total (very aggressive)")
-    print(f"  - Step 4 retries: 50 total (very aggressive)")
+    print(f"  - Step 3: HIGH confidence (0.85-0.7) for exact match with shading")
+    print(f"  - Step 4: LOW confidence (0.6-0.3) for small button")
     print(f"  - Total steps: 4 (Buy → 2nd → 3rd → 4th)")
     print("="*50)
 
