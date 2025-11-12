@@ -16,6 +16,7 @@ BUY_BUTTON_INACTIVE = os.path.join(BUYING_DIR, "buy_button_inactive.png")
 SECOND_STEP_BUTTON = os.path.join(BUYING_DIR, "2ndstep.png")
 THIRD_STEP_BUTTON = os.path.join(BUYING_DIR, "3rdstep.png")
 FOURTH_STEP_BUTTON = os.path.join(BUYING_DIR, "4thstep.png")
+CONFIRM_BUTTON = os.path.join(BUYING_DIR, "5thstep.png")
 
 # Configuration
 CONFIDENCE = 0.7  # Image matching confidence (0.0 to 1.0) - lowered for better matching
@@ -143,12 +144,21 @@ def click_second_step_button():
     return False
 
 
-def click_third_step_button():
+def click_third_step_button_once(attempt_number=1, max_tries=3):
     """
-    Clicks the 3rd step button after the 2nd step has been clicked.
-    Note: Step 3 button has shading - needs VERY HIGH confidence for exact match.
+    Clicks the 3rd step button once with limited retries.
+
+    Args:
+        attempt_number: Which attempt this is (1st or 2nd)
+        max_tries: Maximum number of tries before giving up (default 3)
+
+    Returns:
+        True if clicked successfully, False otherwise
     """
-    print("\n=== Step 3: Clicking 3rd Step Button ===")
+    if attempt_number == 1:
+        print("\n=== Step 3: Clicking 3rd Step Button (1st time) ===")
+    else:
+        print("\n=== Step 3b: Clicking 3rd Step Button (2nd time) ===")
 
     if not os.path.exists(THIRD_STEP_BUTTON):
         print(f"ERROR: 3rdstep.png not found at: {THIRD_STEP_BUTTON}")
@@ -156,10 +166,26 @@ def click_third_step_button():
         return False
 
     # Give the interface MORE time to transition to the 3rd step
-    print(f"Waiting {THIRD_STEP_WAIT} seconds for 3rd step to appear (longer wait)...")
-    time.sleep(THIRD_STEP_WAIT)
+    if attempt_number == 1:
+        print(f"Waiting {THIRD_STEP_WAIT} seconds for 3rd step to appear (longer wait)...")
+        time.sleep(THIRD_STEP_WAIT)
+    else:
+        print(f"Waiting 2 seconds before 2nd attempt...")
+        time.sleep(2.0)
 
-    # Try to find and click the 3rd step button with VERY HIGH confidence for exact match
+    # Try to find and click with high confidence - limited tries for 2nd attempt
+    if attempt_number == 2 and max_tries == 3:
+        # For 2nd attempt with only 3 tries
+        print(f"Attempting to find 3rd step button (limited to {max_tries} tries)...")
+        if find_and_click(THIRD_STEP_BUTTON, "3rd Step Button (2nd attempt)",
+                         retries=max_tries,
+                         confidence=0.95,
+                         wait_between=1.5):
+            return True
+        print("⚠ 3rd step button not found after 3 tries, skipping 2nd click...")
+        return False
+
+    # For 1st attempt with full retries
     print(f"Attempting to find 3rd step button with very high confidence (exact match only)...")
 
     # First try with very high confidence (0.95) - button has unique shading, need exact match
@@ -203,6 +229,24 @@ def click_third_step_button():
     print("  5. Recapture 3rdstep.png with ONLY the shaded button (very precise)")
     print("  6. Try increasing THIRD_STEP_WAIT to 6 or 8 seconds if it loads slowly")
     return False
+
+
+def click_third_step_button_twice():
+    """
+    Clicks the 3rd step button twice.
+    Second attempt skips if button not found after 3 tries.
+    """
+    # First click - full retry logic
+    if not click_third_step_button_once(attempt_number=1):
+        return False
+
+    print("\n✓ Step 3 (1st click) completed successfully!")
+
+    # Second click - skip if not found after 3 tries
+    click_third_step_button_once(attempt_number=2, max_tries=3)
+    print("\n✓ Step 3 (2nd click) completed!")
+
+    return True
 
 
 def click_fourth_step_button():
@@ -285,21 +329,73 @@ def press_enter_key():
     return True
 
 
+def click_confirm_button():
+    """
+    Clicks the confirm button (step 6) after Enter key is pressed.
+    """
+    print("\n=== Step 6: Clicking Confirm Button ===")
+
+    if not os.path.exists(CONFIRM_BUTTON):
+        print(f"ERROR: 5thstep.png not found at: {CONFIRM_BUTTON}")
+        print("Please add the 5thstep.png image to the Buying folder.")
+        return False
+
+    # Give the interface time to show the confirm button
+    print(f"Waiting 2 seconds for confirm button to appear...")
+    time.sleep(2.0)
+
+    # Try to find and click the confirm button with standard confidence
+    print(f"Attempting to find confirm button...")
+
+    # First try with standard confidence
+    print("Attempt 1: Trying with confidence 0.7 (15 retries)...")
+    if find_and_click(CONFIRM_BUTTON, "Confirm Button",
+                     retries=15,
+                     confidence=0.7,
+                     wait_between=1.5):
+        return True
+
+    # Second attempt with lower confidence
+    print("\n⚠ First attempt failed. Trying with lower confidence (0.6, 10 retries)...")
+    if find_and_click(CONFIRM_BUTTON, "Confirm Button (Low Confidence)",
+                     retries=10,
+                     confidence=0.6,
+                     wait_between=2.0):
+        return True
+
+    # Final attempt with very low confidence
+    print("\n⚠ Second attempt failed. Final try with very low confidence (0.5, 5 retries)...")
+    if find_and_click(CONFIRM_BUTTON, "Confirm Button (Very Low Confidence)",
+                     retries=5,
+                     confidence=0.5,
+                     wait_between=2.5):
+        return True
+
+    print("\n❌ ERROR: Could not find confirm button on screen after all attempts!")
+    print("Troubleshooting tips:")
+    print("  1. Make sure the confirm dialog/window is visible and fully loaded")
+    print("  2. Check that 5thstep.png matches the confirm button on screen")
+    print("  3. Try taking a new screenshot of the button")
+    print("  4. Make sure the button is not obscured or off-screen")
+    return False
+
+
 def main():
     """
     Main automation workflow.
     """
     print("="*50)
-    print("RuneLite Buy Button Automation v3.5")
+    print("RuneLite Buy Button Automation v4.0")
     print("="*50)
     print(f"Configuration:")
     print(f"  - Confidence: {CONFIDENCE}")
     print(f"  - Wait time (steps 1-2): {WAIT_TIME}s")
     print(f"  - Wait time (step 3): {THIRD_STEP_WAIT}s (longer)")
     print(f"  - Wait time (step 4): {FOURTH_STEP_WAIT}s (much longer)")
+    print(f"  - Step 3: Clicks TWICE (2nd attempt skips if not found after 3 tries)")
     print(f"  - Step 3: VERY HIGH confidence (0.95-0.8) for exact match with shading")
     print(f"  - Step 4: LOW confidence (0.6-0.3) for small button")
-    print(f"  - Total steps: 5 (Buy → 2nd → 3rd → 4th → Enter)")
+    print(f"  - Total steps: 6 (Buy → 2nd → 3rd×2 → 4th → Enter → Confirm)")
     print("="*50)
 
     # Step 1: Click the buy button
@@ -320,16 +416,14 @@ def main():
 
     print("\n✓ Step 2 completed successfully!")
 
-    # Step 3: Click the 3rd step button
-    if not click_third_step_button():
+    # Step 3: Click the 3rd step button TWICE
+    if not click_third_step_button_twice():
         print("\n❌ [FAILED] Could not complete Step 3 - 3rd step button not clicked")
         print("\n💡 Make sure:")
         print("   - The 3rdstep.png file exists in the Buying folder")
         print("   - The 3rd step window/dialog is visible on screen")
         print("   - The button image in 3rdstep.png matches what's on screen")
         return
-
-    print("\n✓ Step 3 completed successfully!")
 
     # Step 4: Click the 4th step button
     if not click_fourth_step_button():
@@ -348,8 +442,19 @@ def main():
         return
 
     print("\n✓ Step 5 completed successfully!")
+
+    # Step 6: Click confirm button
+    if not click_confirm_button():
+        print("\n❌ [FAILED] Could not complete Step 6 - Confirm button not clicked")
+        print("\n💡 Make sure:")
+        print("   - The 5thstep.png file exists in the Buying folder")
+        print("   - The confirm window/dialog is visible on screen")
+        print("   - The button image in 5thstep.png matches what's on screen")
+        return
+
+    print("\n✓ Step 6 completed successfully!")
     print("\n" + "="*50)
-    print("✓ [SUCCESS] All 5 steps completed successfully!")
+    print("✓ [SUCCESS] All 6 steps completed successfully!")
     print("="*50)
 
 

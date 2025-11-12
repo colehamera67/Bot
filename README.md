@@ -1,11 +1,12 @@
 # RuneLite Buy Button Automation
 
-This script automates the complete 5-step buying process in RuneLite:
+This script automates the complete 6-step buying process in RuneLite:
 1. Click the buy button
 2. Click the 2nd step button
-3. Click the 3rd step button
+3. Click the 3rd step button (TWICE - 2nd attempt skips if not found after 3 tries)
 4. Click the 4th step button
-5. Press Enter key to confirm
+5. Press Enter key
+6. Click the confirm button
 
 ## Setup
 
@@ -18,8 +19,9 @@ pip install -r requirements.txt
    - `buy_button_active.png` - Active buy button
    - `buy_button_inactive.png` - Inactive buy button
    - `2ndstep.png` - 2nd step button
-   - `3rdstep.png` - 3rd step button
+   - `3rdstep.png` - 3rd step button (clicked TWICE)
    - `4thstep.png` - 4th step button
+   - `5thstep.png` - Confirm button
 
    Each image should clearly show the button you want to click at each step.
 
@@ -34,9 +36,10 @@ python buy_automation.py
 4. It will then automatically:
    - Find and click the buy button
    - Wait for the 2nd step to appear and click it
-   - Wait for the 3rd step to appear and click it
+   - Wait for the 3rd step to appear and click it TWICE (2nd click skips if not found after 3 tries)
    - Wait for the 4th step to appear and click it
-   - Press Enter key to confirm the purchase
+   - Press Enter key
+   - Wait for confirm button to appear and click it
 
 ## Files
 
@@ -45,23 +48,24 @@ python buy_automation.py
 - `Buying/buy_button_active.png` - Image of the active buy button
 - `Buying/buy_button_inactive.png` - Image of the inactive buy button
 - `Buying/2ndstep.png` - Image of the 2nd step button
-- `Buying/3rdstep.png` - Image of the 3rd step button
+- `Buying/3rdstep.png` - Image of the 3rd step button (clicked twice)
 - `Buying/4thstep.png` - Image of the 4th step button
+- `Buying/5thstep.png` - Image of the confirm button
 
 ## Troubleshooting
 
 - **Button not found**: Make sure the RuneLite window is visible and not minimized
 - **Wrong button clicked**: Adjust the `CONFIDENCE` value in the script (0.0 to 1.0)
 - **Script too fast**: Increase the `WAIT_TIME` value in the script
-- **Step 3 fails or clicks wrong button**: Step 3 button has unique shading and needs VERY HIGH confidence:
-  - Waits 4 seconds (longer than steps 1-2)
-  - Uses 50 total retries with VERY HIGH confidence levels 0.95 → 0.9 → 0.85 → 0.8
+- **Step 3 fails or clicks wrong button**: Step 3 button is clicked TWICE and has unique shading:
+  - 1st click: Full retry logic with 50 attempts at VERY HIGH confidence (0.95 → 0.9 → 0.85 → 0.8)
+  - 2nd click: Only 3 tries at 0.95 confidence, skips if not found (this is normal if button disappears)
+  - Waits 4 seconds before 1st click, 2 seconds before 2nd click
   - Higher confidence = more exact match = only clicks button WITH shading
   - Confidence 0.95 requires almost pixel-perfect match
-  - Wait times between retries: 1.5s → 2.0s → 2.5s → 3.0s
   - If clicking wrong button, recapture 3rdstep.png with ONLY the shaded button (very precise)
   - Make sure 3rdstep.png shows the button with the shading (not without it)
-  - If still failing, increase `THIRD_STEP_WAIT` to 6 or 8 seconds
+  - If 1st click fails, increase `THIRD_STEP_WAIT` to 6 or 8 seconds
 - **Step 4 fails**: Step 4 has very aggressive special handling:
   - Waits 6 seconds (much longer than other steps)
   - Uses 50 total retries with confidence levels 0.6 → 0.5 → 0.4 → 0.3
