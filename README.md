@@ -1,10 +1,11 @@
 # RuneLite Buy Button Automation
 
-This script automates the complete 4-step buying process in RuneLite:
+This script automates the complete 5-step buying process in RuneLite:
 1. Click the buy button
 2. Click the 2nd step button
 3. Click the 3rd step button
 4. Click the 4th step button
+5. Press Enter key to confirm
 
 ## Setup
 
@@ -35,6 +36,7 @@ python buy_automation.py
    - Wait for the 2nd step to appear and click it
    - Wait for the 3rd step to appear and click it
    - Wait for the 4th step to appear and click it
+   - Press Enter key to confirm the purchase
 
 ## Files
 
@@ -51,12 +53,13 @@ python buy_automation.py
 - **Button not found**: Make sure the RuneLite window is visible and not minimized
 - **Wrong button clicked**: Adjust the `CONFIDENCE` value in the script (0.0 to 1.0)
 - **Script too fast**: Increase the `WAIT_TIME` value in the script
-- **Step 3 fails or clicks wrong button**: Step 3 button has unique shading and needs HIGH confidence:
+- **Step 3 fails or clicks wrong button**: Step 3 button has unique shading and needs VERY HIGH confidence:
   - Waits 4 seconds (longer than steps 1-2)
-  - Uses 50 total retries with HIGH confidence levels 0.85 → 0.8 → 0.75 → 0.7
+  - Uses 50 total retries with VERY HIGH confidence levels 0.95 → 0.9 → 0.85 → 0.8
   - Higher confidence = more exact match = only clicks button WITH shading
+  - Confidence 0.95 requires almost pixel-perfect match
   - Wait times between retries: 1.5s → 2.0s → 2.5s → 3.0s
-  - If clicking wrong button, the shading in the image needs to be captured more precisely
+  - If clicking wrong button, recapture 3rdstep.png with ONLY the shaded button (very precise)
   - Make sure 3rdstep.png shows the button with the shading (not without it)
   - If still failing, increase `THIRD_STEP_WAIT` to 6 or 8 seconds
 - **Step 4 fails**: Step 4 has very aggressive special handling:
